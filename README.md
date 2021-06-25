@@ -4,7 +4,7 @@
   </a>  
 </p>
 <br>
-<p align="center">
+<p align="center"> 
   <img src="https://img.shields.io/github/v/release/dliocode/datastorage?style=flat-square">
   <img src="https://img.shields.io/github/stars/dliocode/datastorage?style=flat-square">
   <img src="https://img.shields.io/github/forks/dliocode/datastorage?style=flat-square">
