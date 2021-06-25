@@ -278,56 +278,56 @@ end.
 
 ### **DataBase**
 
-- **Como contar todos os DataBases** 
+- **Como contar todos os DataBases**  
     ``` TDataStorage.New.DataBase.Count; ```  
   
-- **Como verificar se um DataBase existe** 
+- **Como verificar se um DataBase existe**  
     ``` TDataStorage.New.DataBase.IsExist('NAME'); ```  
   
-- **Como remover um DataBase específico** 
+- **Como remover um DataBase específico**  
     ``` TDataStorage.New.DataBase.Remove('Name'); ```  
   
-- **Como remover todos os DataBase** 
+- **Como remover todos os DataBase**  
     ``` TDataStorage.New.DataBase.Clear; ```  
   
 ### **Table**
 
-- **Como contar todas as tabelas de um DataBase específico** 
+- **Como contar todas as tabelas de um DataBase específico**  
     ``` TDataStorage.New.DataBase('NAME').Table.Count; ```  
   
-- **Como verificar se uma tabela existe de um DataBase específico** 
+- **Como verificar se uma tabela existe de um DataBase específico**  
     ``` TDataStorage.New.DataBase('NAME').Table.IsExist('TABLE NAME'); ```  
   
-- **Como remove uma tabela de um DataBase específico** 
+- **Como remove uma tabela de um DataBase específico**  
     ``` TDataStorage.New.DataBase('NAME').Table.Remove('TABLE NAME'); ```  
   
-- **Como remover todas as tabelas de um DataBase específico** 
+- **Como remover todas as tabelas de um DataBase específico**  
     ``` TDataStorage.New.DataBase('NAME').Table.Clear; ```  
   
 ### **Item**
 
-- **Como contar todos os itens de uma tabela específica e um DataBase específico** 
+- **Como contar todos os itens de uma tabela específica e um DataBase específico**  
     ``` TDataStorage.New.DataBase('NAME').Table('TABLE NAME').Item.Count; ```  
   
-- **Como verificar se um item existe de uma tabela específica e um DataBase específico** 
+- **Como verificar se um item existe de uma tabela específica e um DataBase específico**  
     ``` TDataStorage.New.DataBase('NAME').Table('TABLE NAME').Item.IsExist('ITEM NAME'); ```  
   
-- **Como remove um item de uma tabela específica e um DataBase específico** 
+- **Como remove um item de uma tabela específica e um DataBase específico**  
     ``` TDataStorage.New.DataBase('NAME').Table('TABLE NAME').Item.Remove('ITEM NAME'); ```  
   
-- **Como remover todas os itens de uma tabela específica e um DataBase específico** 
+- **Como remover todas os itens de uma tabela específica e um DataBase específico**  
     ``` TDataStorage.New.DataBase('NAME').Table('TABLE NAME').Item.Clear; ```  
   
 ###  **Data**
 
-- **Como salvar os dados** 
+- **Como salvar os dados**  
     ``` TDataStorage.New.Data.SaveToFile('NAME_FILE.txt', True); // True = Salva Criptografado! ```  
   
-- **Como carregar de um arquivo** 
+- **Como carregar de um arquivo**  
     ```TDataStorage.New.Data.LoadFromFile('NAME_FILE.txt', True); // True = Ler o dados Criptografados! ``` 
 
-- **Como obter os dados sem salvar**
+- **Como obter os dados sem salvar**  
     ``` TDataStorage.New.Data.ToJSON; ```  
   
-- **Como setar os dados**
+- **Como setar os dados**  
     ``` TDataStorage.New.Data.SetJSON(''); ``` 
