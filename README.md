@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="https://user-images.githubusercontent.com/54585337/123442969-d2f00000-d5ab-11eb-86e3-c97073e320c7.png">
-    <img alt="DataStorage" src="https://user-images.githubusercontent.com/54585337/123442969-d2f00000-d5ab-11eb-86e3-c97073e320c7.png">
+  <a href="https://user-images.githubusercontent.com/54585337/123715769-5f6e1d00-d84f-11eb-9f24-d2a3279c09db.png">
+    <img alt="DataStorage" src="https://user-images.githubusercontent.com/54585337/123715769-5f6e1d00-d84f-11eb-9f24-d2a3279c09db.png">
   </a>  
 </p>
 <br>
