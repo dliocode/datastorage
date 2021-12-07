@@ -82,7 +82,6 @@ end;
 function TDataStorageTableUtils.Remove(const ATable: string): IDataStorageTableUtils;
 begin
   Result := Self;
-
   FDictTable.Remove(ATable);
 end;
 

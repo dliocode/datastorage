@@ -70,14 +70,12 @@ end;
 function TDataStorageItemUtils.Clear: IDataStorageItemUtils;
 begin
   Result := Self;
-
   FDictItem.Clear;
 end;
 
 function TDataStorageItemUtils.Remove(const AItem: string): IDataStorageItemUtils;
 begin
   Result := Self;
-
   FDictItem.Remove(AItem);
 end;
 

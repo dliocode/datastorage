@@ -14,6 +14,9 @@ uses
   System.RTTI, System.StrUtils, System.Json, System.SysUtils, System.TypInfo, System.Generics.Collections, System.DateUtils, System.ZLib, System.NetEncoding, System.Classes;
 
 type
+  EDataStorageException = class(Exception)
+  end;
+
   TDataStorageDataUtils = class
   private
     function GetFormatSettings: TFormatSettings;
@@ -52,15 +55,6 @@ var
   LPair: TJsonPair;
   LKey: string;
   LJOValue: TJSONValue;
-  LJOValueObject: TJSONObject;
-  LClassKey: string;
-  LClassValue: TJSONObject;
-  LObject: TObject;
-  LEnumKey: string;
-  LEnumValue: string;
-  LEnumTypeInfo: TRttiType;
-  LEnumValueInt: Integer;
-  LEnumValueT: TValue;
   LValue: TValue;
 begin
   Result := ADataBase;
@@ -120,21 +114,14 @@ begin
 
     tkFloat:
       begin
-        if SameText(string(AValue.TypeInfo.Name), 'TDateTime') then
-          LJO.AddPair(TJsonPair.Create(AName, DateToISO8601(AValue.AsExtended, True)))
+        case IndexStr(string(AValue.TypeInfo.Name), ['TDateTime', 'TDate', 'TTime', 'TTimeStamp']) of
+          0: LJO.AddPair(TJsonPair.Create(AName, DateToISO8601(AValue.AsExtended, False)));
+          1: LJO.AddPair(TJsonPair.Create(AName, DateToStr(AValue.AsExtended, GetFormatSettings)));
+          2: LJO.AddPair(TJsonPair.Create(AName, TimeToStr(AValue.AsExtended, GetFormatSettings)));
+          3: LJO.AddPair(TJsonPair.Create(AName, DateToISO8601(AValue.AsExtended, False)));
         else
-          if SameText(string(AValue.TypeInfo.Name), 'TDate') then
-            LJO.AddPair(TJsonPair.Create(AName, DateToStr(AValue.AsExtended, GetFormatSettings)))
-          else
-            if SameText(string(AValue.TypeInfo.Name), 'TTime') then
-            begin
-              LJO.AddPair(TJsonPair.Create(AName, TimeToStr(AValue.AsExtended, GetFormatSettings)))
-            end
-            else
-              if SameText(string(AValue.TypeInfo.Name), 'TTimeStamp') then
-                LJO.AddPair(TJsonPair.Create(AName, DateToISO8601(AValue.AsExtended, True)))
-              else
-                LJO.AddPair(AName, TJSONNumber.Create(AValue.AsExtended));
+          LJO.AddPair(AName, TJSONNumber.Create(AValue.AsExtended));
+        end;
       end;
 
     tkString, tkUString, tkLString, tkWString, tkWChar, tkChar, tkVariant:
@@ -161,9 +148,6 @@ begin
       begin
         LClass := TRttiContext.Create.GetType(AValue.TypeInfo).AsInstance;
 
-//        if not LClass.IsPublicType then
-//          raise Exception.CreateFmt('Type(%s) is not public!', [AValue.TypeInfo.Name]);
-
         LJOValue := TJSONObject.Create;
 
         for LField in LClass.GetFields do
@@ -178,9 +162,6 @@ begin
     tkRecord:
       begin
         LRecord := TRttiContext.Create.GetType(AValue.TypeInfo).AsRecord;
-
-//        if not LRecord.IsPublicType then
-//          raise Exception.CreateFmt('Type(%s) is not public!', [AValue.TypeInfo.Name]);
 
         LJOValue := TJSONObject.Create;
 
@@ -225,14 +206,15 @@ begin
     try
       LZStream.CopyFrom(LSSInput, LSSInput.Size);
     finally
-      LZStream.DisposeOf;
+      LZStream.Free;
     end;
+
     LText := TNetEncoding.Base64.Encode(LSSOutput.Bytes);
 
     Result := TEncoding.UTF8.GetString(LText);
   finally
-    LSSInput.DisposeOf;
-    LSSOutput.DisposeOf;
+    LSSInput.Free;
+    LSSOutput.Free;
   end;
 end;
 
@@ -254,15 +236,15 @@ begin
       try
         LSSOutput.CopyFrom(LZStream, LZStream.Size);
       finally
-        LZStream.DisposeOf;
+        LZStream.Free;
       end;
+
       Result := LSSOutput.DataString;
     finally
-      LSSInput.DisposeOf;
-      LSSOutput.DisposeOf;
+      LSSInput.Free;
+      LSSOutput.Free;
     end;
   except
-    Exit;
   end;
 end;
 
@@ -277,7 +259,7 @@ begin
   LClass := TDataStorageRTTI.FindAnyClass(AClassName, tkClass);
 
   if not Assigned(LClass) then
-    raise Exception.CreateFmt('Type (%s) not found!', [AClassName]);
+    raise EDataStorageException.CreateFmt('Type (%s) not found!', [AClassName]);
 
   LClassInstance := TRttiContext.Create.GetType(LClass.Handle).AsInstance;
   LObject := LClassInstance.MetaclassType.Create;
@@ -302,7 +284,7 @@ begin
   LClass := TDataStorageRTTI.FindAnyClass(AKeyEnum, tkEnumeration);
 
   if not Assigned(LClass) then
-    raise Exception.CreateFmt('Type (%s) not found!', [AKeyEnum]);
+    raise EDataStorageException.CreateFmt('Type (%s) not found!', [AKeyEnum]);
 
   LEnumValueInt := GetEnumValue(LClass.Handle, AValueEnum);
   TValue.Make(LEnumValueInt, LClass.Handle, Result);
@@ -319,7 +301,7 @@ begin
   LClass := TDataStorageRTTI.FindAnyClass(AKeyRecord, tkRecord);
 
   if not Assigned(LClass) then
-    raise Exception.CreateFmt('Type (%s) not found!', [AKeyRecord]);
+    raise EDataStorageException.CreateFmt('Type (%s) not found!', [AKeyRecord]);
 
   LClassInstance := TRttiContext.Create.GetType(LClass.Handle).AsRecord;
 
@@ -369,7 +351,7 @@ function TDataStorageDataUtils.JSONValueToTValue(const AJSON: TJSONValue; const 
   function ISOToDateTime(const ADateTime: string): TDateTime;
   begin
     if ADateTime.Contains('T') then
-      Result := ISO8601ToDate(ADateTime)
+      Result := ISO8601ToDate(ADateTime, False)
     else
       Result := StrToDateTime(ADateTime);
   end;
@@ -431,19 +413,14 @@ begin
 
         tkFloat:
           begin
-            if SameText(ARttiType.Name, 'TDateTime') then
-              Result := ISOToDateTime(AJSON.AsType<string>)
+            case IndexStr(ARttiType.Name, ['TDateTime', 'TDate', 'TTime', 'TTimeStamp']) of
+              0: Result := ISOToDateTime(AJSON.AsType<string>);
+              1: Result := StrToDate(AJSON.AsType<string>, GetFormatSettings);
+              2: Result := StrToTime(AJSON.AsType<string>, GetFormatSettings);
+              3: Result := ISOToDateTime(AJSON.AsType<string>);
             else
-              if SameText(ARttiType.Name, 'TDate') then
-                Result := StrToDate(AJSON.AsType<string>, GetFormatSettings)
-              else
-                if SameText(ARttiType.Name, 'TTime') then
-                  Result := StrToTime(AJSON.AsType<string>, GetFormatSettings)
-                else
-                  if SameText(ARttiType.Name, 'TTimeStamp') then
-                    Result := ISOToDateTime(AJSON.AsType<string>)
-                  else
-                    Result := AJSON.AsType<Double>;
+              Result := AJSON.AsType<Double>;
+            end;
           end;
 
         tkArray, tkDynArray:

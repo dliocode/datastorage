@@ -75,7 +75,7 @@ begin
     LObject := FValue.AsObject;
     try
       if Assigned(LObject) then
-        LObject.DisposeOf;
+        LObject.Free;
     except
     end;
   end;

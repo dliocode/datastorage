@@ -45,7 +45,7 @@ end;
 
 destructor TDataStorageItem.Destroy;
 begin
-  FDict.DisposeOf;
+  FDict.Free;
   inherited;
 end;
 

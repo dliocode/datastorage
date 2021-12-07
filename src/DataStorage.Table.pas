@@ -43,7 +43,7 @@ end;
 
 destructor TDataStorageTable.Destroy;
 begin
-  FDict.DisposeOf;
+  FDict.Free;
   inherited;
 end;
 
